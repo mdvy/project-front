@@ -1,0 +1,35 @@
+
+h1{
+    text-align: center
+}
+
+.main_container{
+    padding:50px
+}
+
+.centered{
+    display: flex;
+    justify-content: center
+}
+
+#table_size_selector{
+    max-width: 80px;
+    display: inline
+}
+
+.selected_page{
+    color: darkorange;
+    font-weight: bold
+}
+
+.pointer_mouse{
+    cursor: pointer
+}
+
+.my_form{
+    padding: 10px;
+    width: 400px
+}
+.bold_font{
+    font-weight: bold;
+}

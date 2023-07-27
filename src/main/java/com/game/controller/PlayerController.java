@@ -1,6 +1,8 @@
 package com.game.controller;
 
 import com.game.entity.Player;
+import com.game.entity.Profession;
+import com.game.entity.Race;
 import com.game.service.PlayerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -42,6 +45,7 @@ public class PlayerController {
         return playerService.getAllCount();
     }
 
+
     @PostMapping
     public ResponseEntity<PlayerInfo> createPlayer(@RequestBody PlayerInfo info) {
         if (StringUtils.isEmpty(info.name) || info.name.length() > 12) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
@@ -66,8 +70,10 @@ public class PlayerController {
         if (id <= 0) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         if (nonNull(info.name) && (info.name.length() > 12 || info.name.isEmpty())) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         if (nonNull(info.title) && info.title.length() > 30) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        if (isNull(info.birthday) || info.birthday < 0) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        if (isNull(info.level) || info.level < 0 || info.level > 100) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
 
-        Player player = playerService.updatePlayer(id, info.name, info.title, info.race, info.profession, info.banned);
+        Player player = playerService.updatePlayer(id, info.name, info.title, info.race, info.profession, info.banned, info.level, info.birthday);
         if (isNull(player)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         } else {
@@ -85,6 +91,16 @@ public class PlayerController {
         } else {
             return ResponseEntity.status(HttpStatus.OK).body(null);
         }
+    }
+
+    @GetMapping("/listOfProfession")
+    public List<String> getListOfProfession(){
+        return Arrays.stream(Profession.values()).map(String::valueOf).collect(Collectors.toList());
+    }
+
+    @GetMapping("/listOfRace")
+    public List<String> getListOfRace(){
+        return Arrays.stream(Race.values()).map(String::valueOf).collect(Collectors.toList());
     }
 
     private static PlayerInfo toPlayerInfo(Player player) {

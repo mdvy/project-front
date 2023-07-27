@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.List;
 
@@ -43,7 +45,7 @@ public class PlayerService {
         return playerRepository.save(player);
     }
 
-    public Player updatePlayer(long id, String name, String title, Race race, Profession profession, Boolean banned) {
+    public Player updatePlayer(long id, String name, String title, Race race, Profession profession, Boolean banned, Integer level, Long birthday) {
         Player player = playerRepository.findById(id).orElse(null);
         if (isNull(player)) {
             return null;
@@ -70,6 +72,14 @@ public class PlayerService {
 
         if (nonNull(banned)) {
             player.setBanned(banned);
+            needUpdate = true;
+        }
+        if (nonNull(level)) {
+            player.setLevel(level);
+            needUpdate = true;
+        }
+        if (nonNull(birthday)) {
+            player.setBirthday(new Date(birthday));
             needUpdate = true;
         }
 
