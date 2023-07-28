@@ -1,9 +1,8 @@
-
 //lists for using in select-inputs, load from repository
 let professions;
 let races;
 
-function getList(pageN) { //load list of users from repository and fill the table
+function getListOfUsers(pageN) { //load list of users from repository and fill the table
 
     $("#tablePlayers").find("tr:has(td)").remove();
 
@@ -18,8 +17,8 @@ function getList(pageN) { //load list of users from repository and fill the tabl
                 item.level + "</td><td>" +
                 new Date(item.birthday).toLocaleDateString() + "</td><td>" +
                 item.banned + "</td><td>" +
-                "<img src='/img/edit.png' class='pointer_mouse' onclick='edit_user(" + item.id + ")'>" + "</td><td>" +
-                "<img src='/img/delete.png' class='pointer_mouse' onclick='delete_user(" + item.id + ")'>" + "</td></tr>"
+                "<img src='/img/edit.png' class='pointer_mouse' onclick='editUser(" + item.id + ")'>" + "</td><td>" +
+                "<img src='/img/delete.png' class='pointer_mouse' onclick='deleteUser(" + item.id + ")'>" + "</td></tr>"
             ).appendTo("#tablePlayers");
         })
     });
@@ -45,7 +44,7 @@ function getList(pageN) { //load list of users from repository and fill the tabl
             a.attr("style", "color: darkorange; font-weight: bold;");
             a.attr("class", "page-link curr-page");
         } else
-            a.attr("onclick", "getList(" + (i - 1) + ")");
+            a.attr("onclick", "getListOfUsers(" + (i - 1) + ")");
 
         $("<li class='page-item'></li>").append(a).appendTo("#page_counter");
 
@@ -64,30 +63,30 @@ function getTotalCount() { //return count of users in repository
     return res;
 }
 
-function delete_user(user_id) {
+function deleteUser(user_id) {
     $.ajax({
         url: "/rest/players/" + user_id,
         type: "DELETE",
         success: function () {
             let last_page = parseInt($("#page_counter").find("li:last").find("a:first").text());
-            if (getTotalCount() % $("#table_size_selector").val() === 0 && get_current_page() + 1 === last_page)
-                getList(get_current_page() - 1);
+            if (getTotalCount() % $("#table_size_selector").val() === 0 && getCurrentPage() + 1 === last_page)
+                getListOfUsers(getCurrentPage() - 1);
             else
-                getList(get_current_page());
+                getListOfUsers(getCurrentPage());
         }
     });
 }
 
-function get_current_page(){
+function getCurrentPage() {
     return parseInt($(".curr-page:first").attr("id").slice(12)) - 1;
 }
 
-function edit_user(user_id) { //make user editable
+function editUser(user_id) { //make user editable
 
     //repaint images
     $("#row" + user_id).find("td:eq(9)").find("img").remove();
     $("#row" + user_id).find("td:eq(8)").find("img").attr("src", "/img/save.png");
-    $("#row" + user_id).find("td:eq(8)").find("img").attr("onclick", "save_user(" + user_id + ")");
+    $("#row" + user_id).find("td:eq(8)").find("img").attr("onclick", "saveUser(" + user_id + ")");
 
     //create name input field and fill with current text
 
@@ -142,10 +141,11 @@ function edit_user(user_id) { //make user editable
     let birthday_value = birthday.text();
 
     birthday.html(
-        "<input data-date-format='dd.mm.yyyy' style='width: 150px' type='text' class='datepicker form-control' id='datepicker_" + user_id + "'>"
+        "<input data-date-format='dd.mm.yyyy' style='width: 150px' type='text' " +
+        "class='datepicker form-control' id='datepicker_" + user_id + "'>"
     );
 
-    load_datepicker();
+    loadDatepicker();
 
     $("#datepicker_" + user_id).val(birthday_value);
 
@@ -163,7 +163,7 @@ function edit_user(user_id) { //make user editable
     $("#edit_banned_" + user_id).val(banned_value);
 }
 
-function save_user(user_id){ //save edited user
+function saveUser(user_id) { //save edited user
 
     let name = $("#edit_name_" + user_id).val();
     if (name.length === 0) {
@@ -196,21 +196,21 @@ function save_user(user_id){ //save edited user
         async: false,
         contentType: "application/json; charset=utf-8",
         data: JSON.stringify({
-            "name"  : name,
-            "title" : title,
-            "race"  : race,
-            "profession" : profession,
-            "level" : level,
-            "birthday"  : birthday,
+            "name": name,
+            "title": title,
+            "race": race,
+            "profession": profession,
+            "level": level,
+            "birthday": birthday,
             "banned": banned
         }),
         success: function () {
-            getList(get_current_page());
+            getListOfUsers(getCurrentPage());
         }
-        });
+    });
 }
 
-function dateFromString(string){ //method for parsing Date from localeDate
+function dateFromString(string) { //method for parsing Date from localeDate
     const regex = /^(0?[1-9]|[12][0-9]|3[01])\.(0?[1-9]|1[012])\.((19|20)\d\d)$/;
 
     if (!regex.test(string))
@@ -224,12 +224,12 @@ function dateFromString(string){ //method for parsing Date from localeDate
     return new Date(year, month, day);
 }
 
-function init_form_fields(){ //init list-fields in form on load page
+function initFormFields() { //init list-fields in form on load page
 
-    load_datepicker();
+    loadDatepicker();
 
-    professions = get_list("/rest/players/listOfProfession");
-    races = get_list("/rest/players/listOfRace");
+    professions = getListFromRepo("/rest/players/listOfProfession");
+    races = getListFromRepo("/rest/players/listOfRace");
 
     $.each(professions, function (i, item) {
         $("#create_profession").append("<option>" + item + "</option>");
@@ -244,7 +244,8 @@ function init_form_fields(){ //init list-fields in form on load page
 
     $("#create_datepicker").val(new Date().toLocaleDateString());
 }
-function get_list(path){ //return list of data by Get-method from repository
+
+function getListFromRepo(path) { //return list of data by Get-method from repository
     let result;
     $.ajax({
         url: path,
@@ -257,7 +258,7 @@ function get_list(path){ //return list of data by Get-method from repository
     return result;
 }
 
-function create_user(){ //create user via the form
+function createUser() { //create user via the form
 
     let name = $("#create_name").val();
     if (name.length === 0) {
@@ -290,26 +291,25 @@ function create_user(){ //create user via the form
         async: false,
         contentType: "application/json; charset=utf-8",
         data: JSON.stringify({
-            "name"  : name,
-            "title" : title,
-            "race"  : race,
-            "profession" : profession,
-            "level" : level,
-            "birthday"  : birthday,
+            "name": name,
+            "title": title,
+            "race": race,
+            "profession": profession,
+            "level": level,
+            "birthday": birthday,
             "banned": banned
         }),
         success: function () {
             let last_page = parseInt($("#page_counter").find("li:last").find("a:first").text());
             if (isNaN(last_page)) last_page = 0;
             if (getTotalCount() % $("#table_size_selector").val() === 1) {
-                getList(last_page);
-            }
-            else
-                getList(last_page - 1);
+                getListOfUsers(last_page);
+            } else
+                getListOfUsers(last_page - 1);
         }
     });
 }
 
-function load_datepicker(){
+function loadDatepicker() {
     $('.datepicker').datepicker()
 }

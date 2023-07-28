@@ -1,35 +1,46 @@
 
-h1{
+h1 {
     text-align: center
 }
 
-.main_container{
-    padding:50px
+.main_container {
+    padding: 10px
 }
 
-.centered{
+.centered {
     display: flex;
     justify-content: center
 }
 
-#table_size_selector{
+#table_size_selector {
     max-width: 80px;
     display: inline
 }
 
-.selected_page{
+.selected_page {
     color: darkorange;
     font-weight: bold
 }
 
-.pointer_mouse{
+.pointer_mouse {
     cursor: pointer
 }
 
-.my_form{
+.my_form {
+    /*position: fixed;*/
+    margin-left: 0.5%;
+    margin-right: 0.5%;
+    float: left;
     padding: 10px;
-    width: 400px
+    width: 18%;
 }
-.bold_font{
+
+.bold_font {
     font-weight: bold;
+}
+
+.table_container {
+    margin-right: 0.5%;
+    float: right;
+    width: 80%
 }

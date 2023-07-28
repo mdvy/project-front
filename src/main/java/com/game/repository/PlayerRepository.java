@@ -63,7 +63,6 @@ public class PlayerRepository {
                 .skip((long) pageNumber * pageSize)
                 .limit(pageSize)
                 .collect(Collectors.toList());
-
     }
 
     public int getAllCount() {
